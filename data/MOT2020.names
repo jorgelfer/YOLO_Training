@@ -1,0 +1,13 @@
+Pedestrian
+PersonOnVehicle
+Car
+Bicycle
+Motorbike
+NonMotorizedVehicle
+StaticPerson
+Distractor
+Occluder
+OccluderOnTheGround
+OccluderFull
+Reflection
+Crowd
