@@ -11,15 +11,15 @@ import numpy as np
 import io
 import PIL.Image
 from yolov3_tf2 import dataset_util
+from tqdm import tqdm
 
 flags = tf.compat.v1.flags
-flags.DEFINE_string('data_dir', './input/MOT20/train/', 'Root directory to raw MOT dataset.')
+flags.DEFINE_string('data_dir', './data/MOT20/train/', 'Root directory to raw MOT dataset.')
 flags.DEFINE_string('classes_file','./data/MOT2020.names', 'path to classes file')
-flags.DEFINE_string('output_path','./data/', 'Path to output TFRecord')
+flags.DEFINE_string('output_path','./data/MOT20_tfrecords_3/', 'Path to output TFRecord')
 FLAGS = flags.FLAGS
 
 dirs = ['MOT20-01','MOT20-02','MOT20-03','MOT20-05']
-
 
 def create_tf_example(filename, objs, class_names):
     
@@ -82,32 +82,47 @@ def create_tf_example(filename, objs, class_names):
 
 def main(_argv):
     # TODO(user): Write code to read in your dataset to examples variable
-    suffix = '.tfrecords'
-    record_file = os.path.join(FLAGS.output_path, 'MOT20_train' + suffix)
     class_names = [c.strip() for c in open(FLAGS.classes_file).readlines()]
     logging.info('classes loaded')
-    with tf.io.TFRecordWriter(record_file) as writer:
-        for dirin in dirs:
-            logging.info('Reading from %s', dirin)
-            sequence_dir = os.path.join(FLAGS.data_dir,dirin)
-            image_dir = os.path.join(sequence_dir, "img1")
-            image_filenames = {
-                int(os.path.splitext(f)[0]): os.path.join(image_dir, f)
-                for f in sorted(os.listdir(image_dir))}
-            
-            groundtruth_file = os.path.join(sequence_dir, "gt/gt.txt")
-            groundtruth = None
-            if os.path.exists(groundtruth_file):
-                groundtruth = np.loadtxt(groundtruth_file, delimiter=',')
-                groundtruth = tf.convert_to_tensor(groundtruth)
+    n_images_shard = 200
+        
+    for i, dirin in enumerate(dirs):
+        logging.info('Reading from %s', dirin)
+        sequence_dir = os.path.join(FLAGS.data_dir,dirin)
+        image_dir = os.path.join(sequence_dir, "img1")
+        image_filenames = {
+            int(os.path.splitext(f)[0]): os.path.join(image_dir, f)
+            for f in sorted(os.listdir(image_dir))}
+        
+        groundtruth_file = os.path.join(sequence_dir, "gt/gt.txt")
+        groundtruth = None
+        if os.path.exists(groundtruth_file):
+            groundtruth = np.loadtxt(groundtruth_file, delimiter=',')
+            groundtruth = tf.convert_to_tensor(groundtruth)
+        
+        n_shards = int(len(image_filenames) / n_images_shard) + (1 if len(image_filenames) % n_images_shard != 0 else 0)
+        index = 1
+        for shard in tqdm(range(n_shards)):            
+            tfrecords_shard_path = "{}_{}_{}_{}.records".format('MOT20', 'train',
+                                                             '%.5d-of-%.5d' % (i, len(dirs) - 1),
+                                                             ' %.5d-of-%.5d' % (shard, n_shards - 1))        
+            end = index + n_images_shard if len(image_filenames) > (index + n_images_shard) else len(image_filenames) + 1
+            if end == len(image_filenames) + 1:
+                tfrecords_shard_path = "{}_{}_{}.records".format('MOT20', 'val',
+                                                             '%.5d-of-%.5d' % (i, len(dirs) - 1))
                 
-            for frame, filename in image_filenames.items():
-                frame_objs = tf.equal(groundtruth[:,0],frame)
-                tf_example = create_tf_example(filename,
-                                               tf.boolean_mask(groundtruth,frame_objs),
-                                               class_names)
-                writer.write(tf_example.SerializeToString())
-    writer.close()
+            image_filenames_2 = {x:image_filenames[x] for x in list(range(index, end))}
+            
+            with tf.io.TFRecordWriter(os.path.join(FLAGS.output_path,
+                                                   tfrecords_shard_path)) as writer:
+                for frame, filename in image_filenames_2.items():
+                    frame_objs = tf.equal(groundtruth[:,0],frame)
+                    tf_example = create_tf_example(filename,
+                                                   tf.boolean_mask(groundtruth,frame_objs),
+                                                   class_names)
+                    writer.write(tf_example.SerializeToString())
+            writer.close()
+            index = end
 
 if __name__ == '__main__':
     try:
