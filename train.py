@@ -175,7 +175,10 @@ def main(_argv):
             ReduceLROnPlateau(verbose=1),
             EarlyStopping(patience=3, verbose=1),
             ModelCheckpoint('checkpoints/yolov3_train_{epoch}.tf',
-                            verbose=1, save_weights_only=True),
+                            save_weights_only=True,
+                            monitor='loss',
+                            mode='min',
+                            save_best_only=True),
             TensorBoard(log_dir='logs')
         ]
 
