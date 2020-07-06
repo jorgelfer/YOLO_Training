@@ -184,10 +184,14 @@ def main(_argv):
 
         model.fit(train_dataset,
                   epochs=FLAGS.epochs,
-                  steps_per_epoch=268,#tsteps,
                   callbacks=callbacks,
-                  validation_data=val_dataset,
-                  validation_steps=10)#vsteps)
+                  validation_data=val_dataset)
+#        model.fit(train_dataset,
+#                  epochs=FLAGS.epochs,
+#                  steps_per_epoch=268,#tsteps,
+#                  callbacks=callbacks,
+#                  validation_data=val_dataset,
+#                  validation_steps=10)#vsteps)
 
 if __name__ == '__main__':
     try:
