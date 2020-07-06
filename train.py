@@ -181,13 +181,10 @@ def main(_argv):
             TensorBoard(log_dir='logs')
         ]
 
-        history = model.fit(train_dataset,
-                            steps_per_epoch=268,
-                            epochs=FLAGS.epochs,
-                            callbacks=callbacks,
-                            validation_data=val_dataset,
-                            validation_steps=50)
-
+        model.fit(train_dataset,
+                  epochs=FLAGS.epochs,
+                  callbacks=callbacks,
+                  validation_data=val_dataset)
 
 if __name__ == '__main__':
     try:
