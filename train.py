@@ -60,7 +60,6 @@ def main(_argv):
     if FLAGS.dataset:
         train_dataset = dataset.load_tfrecord_dataset(
             FLAGS.dataset, FLAGS.classes, FLAGS.size)
-    train_dataset = train_dataset.shuffle(buffer_size=512, reshuffle_each_iteration=True)
     train_dataset = train_dataset.batch(FLAGS.batch_size, drop_remainder=True)
     train_dataset = train_dataset.repeat(FLAGS.epochs)
     train_dataset = train_dataset.map(lambda x, y: (
