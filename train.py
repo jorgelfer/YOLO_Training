@@ -62,7 +62,7 @@ def main(_argv):
             FLAGS.dataset, FLAGS.classes, FLAGS.size)
     train_dataset = train_dataset.batch(FLAGS.batch_size, drop_remainder=True)
     train_dataset = train_dataset.repeat(FLAGS.epochs)
-    tsteps = sum(1 for _ in train_dataset)
+    #tsteps = sum(1 for _ in train_dataset)
     train_dataset = train_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
@@ -73,8 +73,8 @@ def main(_argv):
     if FLAGS.val_dataset:
         val_dataset = dataset.load_tfrecord_dataset(
             FLAGS.val_dataset, FLAGS.classes, FLAGS.size)
-    vsteps = sum(1 for _ in val_dataset)
-    val_dataset = val_dataset.batch(FLAGS.batch_size)
+    val_dataset = val_dataset.batch(FLAGS.batch_size, drop_remainder=True)
+    #vsteps = sum(1 for _ in val_dataset)
     val_dataset = val_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
@@ -184,10 +184,10 @@ def main(_argv):
 
         model.fit(train_dataset,
                   epochs=FLAGS.epochs,
-                  steps_per_epoch=tsteps,
+                  steps_per_epoch=268;#tsteps,
                   callbacks=callbacks,
                   validation_data=val_dataset,
-                  validation_steps=vsteps)
+                  validation_steps=10)#vsteps)
 
 if __name__ == '__main__':
     try:
