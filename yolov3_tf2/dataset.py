@@ -125,7 +125,7 @@ def load_tfrecord_dataset(file_pattern, class_file, size=416):
     #    class_file, tf.string, 0, tf.int64, LINE_NUMBER, delimiter="\n"), -1)
     files = tf.data.Dataset.list_files(file_pattern)
     ds_size = sum(1 for _ in files)
-    return files.interleave(lambda x: tf.data.TFRecordDataset(x).map(parse_tfrecord), cycle_length=ds_size, block_length=16, num_parallel_calls=tf.data.experimental.AUTOTUNE,deterministic=False)
+    return files.interleave(lambda x: tf.data.TFRecordDataset(x).map(parse_tfrecord), cycle_length=ds_size, block_length=8, num_parallel_calls=tf.data.experimental.AUTOTUNE,deterministic=False)
     #dataset = files.flat_map(tf.data.TFRecordDataset)
     #for data in dataset:
     #    parse_tfrecord(data, class_table, size)
