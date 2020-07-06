@@ -60,6 +60,7 @@ def main(_argv):
     if FLAGS.dataset:
         train_dataset = dataset.load_tfrecord_dataset(
             FLAGS.dataset, FLAGS.classes, FLAGS.size)
+    train_dataset = train_dataset.shuffle(buffer_size=256, reshuffle_each_iteration=True)
     train_dataset = train_dataset.batch(FLAGS.batch_size, drop_remainder=True)
     train_dataset = train_dataset.repeat(FLAGS.epochs)
     #tsteps = sum(1 for _ in train_dataset)
@@ -74,6 +75,7 @@ def main(_argv):
         val_dataset = dataset.load_tfrecord_dataset(
             FLAGS.val_dataset, FLAGS.classes, FLAGS.size)
     val_dataset = val_dataset.batch(FLAGS.batch_size, drop_remainder=True)
+    val_dataset = val_dataset.repeat(FLAGS.epochs)
     #vsteps = sum(1 for _ in val_dataset)
     val_dataset = val_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
