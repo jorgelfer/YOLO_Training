@@ -180,9 +180,11 @@ def main(_argv):
         ]
 
         history = model.fit(train_dataset,
+                            steps_per_epoch=268,
                             epochs=FLAGS.epochs,
                             callbacks=callbacks,
-                            validation_data=val_dataset)
+                            validation_data=val_dataset,
+                            validation_steps=50)
 
 
 if __name__ == '__main__':
