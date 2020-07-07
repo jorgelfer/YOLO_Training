@@ -191,8 +191,8 @@ def main(_argv):
         model.fit(train_dataset,
                   epochs=FLAGS.epochs,
                   steps_per_epoch=268,
-                  callbacks=callbacks,
-                  validation_data=val_dataset)
+                  callbacks=callbacks)
+#                  validation_data=val_dataset,
 #                  validation_steps=10)
 
 if __name__ == '__main__':
