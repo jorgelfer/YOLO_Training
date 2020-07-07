@@ -75,7 +75,7 @@ def main(_argv):
         val_dataset = dataset.load_tfrecord_dataset(
             FLAGS.val_dataset, FLAGS.classes, FLAGS.size)
     val_dataset = val_dataset.batch(FLAGS.batch_size, drop_remainder=True)
-    #val_dataset = val_dataset.repeat(FLAGS.epochs)
+    val_dataset = val_dataset.repeat(FLAGS.epochs)
     #vsteps = sum(1 for _ in val_dataset)
     val_dataset = val_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
