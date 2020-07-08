@@ -184,16 +184,16 @@ def main(_argv):
             TensorBoard(log_dir='logs')
         ]
 
-        model.fit(train_dataset,
-                  epochs=FLAGS.epochs,
-                  callbacks=callbacks,
-                  validation_data=val_dataset)
 #        model.fit(train_dataset,
 #                  epochs=FLAGS.epochs,
-#                  steps_per_epoch=268,
 #                  callbacks=callbacks,
-#                  validation_data=val_dataset,
-#                  validation_steps=10)
+#                  validation_data=val_dataset)
+        model.fit(train_dataset,
+                  epochs=FLAGS.epochs,
+                  steps_per_epoch=268,
+                  callbacks=callbacks,
+                  validation_data=val_dataset,
+                  validation_steps=10)
 
 if __name__ == '__main__':
     try:
