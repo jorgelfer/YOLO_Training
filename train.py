@@ -180,14 +180,10 @@ def main(_argv):
             ModelCheckpoint('checkpoints/yolov3_train_{epoch}.tf',
                             verbose=1,
                             save_weights_only=True,
-                            period=1000),
+                            period=10),
             TensorBoard(log_dir='logs')
         ]
 
-#        model.fit(train_dataset,
-#                  epochs=FLAGS.epochs,
-#                  callbacks=callbacks,
-#                  validation_data=val_dataset)
         model.fit(train_dataset,
                   epochs=FLAGS.epochs,
                   steps_per_epoch=268,
