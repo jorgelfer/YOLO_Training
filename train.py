@@ -60,10 +60,10 @@ def main(_argv):
     if FLAGS.dataset:
         train_dataset = dataset.load_tfrecord_dataset(
             FLAGS.dataset, FLAGS.classes, FLAGS.size)
+    tsteps = sum(1 for _ in train_dataset)
     train_dataset = train_dataset.shuffle(buffer_size=256, reshuffle_each_iteration=True)
     train_dataset = train_dataset.batch(FLAGS.batch_size, drop_remainder=True)
     train_dataset = train_dataset.repeat(FLAGS.epochs)
-    #tsteps = sum(1 for _ in train_dataset)
     train_dataset = train_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
@@ -74,9 +74,9 @@ def main(_argv):
     if FLAGS.val_dataset:
         val_dataset = dataset.load_tfrecord_dataset(
             FLAGS.val_dataset, FLAGS.classes, FLAGS.size)
+    vsteps = sum(1 for _ in val_dataset)
     val_dataset = val_dataset.batch(FLAGS.batch_size, drop_remainder=True)
     val_dataset = val_dataset.repeat(FLAGS.epochs)
-    #vsteps = sum(1 for _ in val_dataset)
     val_dataset = val_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
@@ -186,10 +186,10 @@ def main(_argv):
 
         model.fit(train_dataset,
                   epochs=FLAGS.epochs,
-                  steps_per_epoch=268,
+                  steps_per_epoch=floor(tsteps/FLAGS.batch_size),
                   callbacks=callbacks,
                   validation_data=val_dataset,
-                  validation_steps=10)
+                  validation_steps=floor(vsteps/FLAGS.batch_size))
 
 if __name__ == '__main__':
     try:
