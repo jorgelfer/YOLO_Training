@@ -186,10 +186,10 @@ def main(_argv):
 
         model.fit(train_dataset,
                   epochs=FLAGS.epochs,
-                  steps_per_epoch=floor(tsteps/FLAGS.batch_size),
+                  steps_per_epoch=int(tsteps/FLAGS.batch_size),
                   callbacks=callbacks,
                   validation_data=val_dataset,
-                  validation_steps=floor(vsteps/FLAGS.batch_size))
+                  validation_steps=int(vsteps/FLAGS.batch_size))
 
 if __name__ == '__main__':
     try:
