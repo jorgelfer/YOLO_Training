@@ -23,7 +23,7 @@ def main(_argv):
                 continue
             data.append([x2-x1, y2-y1])
     out = kmeans(np.asarray(data), k=FLAGS.clusters)
-    print("Accuracy: {:.2f}%".format(avg_iou(data, out) * 100))
+    print("Accuracy: {:.2f}%".format(avg_iou(np.asarray(data), out) * 100))
     print("Boxes:\n {}".format(out))
     #
     ratios = np.around(out[:, 0] / out[:, 1], decimals=2).tolist()

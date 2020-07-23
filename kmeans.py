@@ -66,6 +66,7 @@ def kmeans(boxes, k, dist=np.median):
     # the Forgy method will fail if the whole array contains the same rows
     clusters = boxes[np.random.choice(rows, k, replace=False)]
     print('kmeans loop')
+    cont = 0
     while True:
         for row in range(rows):
             distances[row] = 1 - iou(boxes[row], clusters)
@@ -79,5 +80,6 @@ def kmeans(boxes, k, dist=np.median):
             clusters[cluster] = dist(boxes[nearest_clusters == cluster], axis=0)
 
         last_clusters = nearest_clusters
-
+        cont += 1
+    print(cont)
     return clusters
