@@ -22,7 +22,6 @@ def main(_argv):
             if x1 == 0 and x2 == 0:
                 continue
             data.append([x2-x1, y2-y1])
-    breakpoint()
     out = kmeans(np.asarray(data), k=FLAGS.clusters)
     print("Accuracy: {:.2f}%".format(avg_iou(data, out) * 100))
     print("Boxes:\n {}".format(out))
