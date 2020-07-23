@@ -18,8 +18,10 @@ def iou(box, clusters):
     box_area = box[0] * box[1]
     cluster_area = clusters[:, 0] * clusters[:, 1]
 
-    iou_ = intersection / (box_area + cluster_area - intersection)
-
+    try:
+        iou_ = intersection / (box_area + cluster_area - intersection)
+    except:
+        print('\tba={}ca={}int={}'.format(str(box_area),str(cluster_area),str(intersection)))
     return iou_
 
 
