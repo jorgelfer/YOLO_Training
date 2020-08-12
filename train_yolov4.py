@@ -10,10 +10,9 @@ from tensorflow.keras.callbacks import (
     ModelCheckpoint,
     TensorBoard
 )
-from yolov3_tf2.models import (
-    YoloV3, YoloV3Tiny, YoloLoss,
-    yolo_anchors, yolo_anchor_masks,
-    yolo_tiny_anchors, yolo_tiny_anchor_masks
+from yolov3_tf2.yolov4 import (
+    YoloV4, YoloLoss,
+    yolov4_anchors, yolov4_anchor_masks,
 )
 from yolov3_tf2.utils import freeze_all
 import yolov3_tf2.dataset as dataset
