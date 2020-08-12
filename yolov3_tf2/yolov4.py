@@ -31,7 +31,7 @@ flags.DEFINE_float('yolo_score_threshold', 0.6, 'score threshold')
 # For YoloV4 ######################
 yolov4_anchors = np.array([(12, 16), (19, 36), (40,28), (36,75), (76,55),(72,146), (142,110), (192,243), (459,401)], np.float32) / 608
 yolov4_anchor_masks = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-xyscale = np.array([1.2, 1.1, 1.05])
+xyscales = np.array([1.2, 1.1, 1.05])
 strides = np.array([8, 16, 32])
 ####################################
 
@@ -174,7 +174,7 @@ def YoloOutput(filters, anchors, classes, name=None):
         return tf.keras.Model(inputs, x, name=name)(x_in)
     return yolo_output
 
-def yolov4_boxes(pred, anchors, classes, xyscale, strides):
+def yolov4_boxes(pred, anchors, classes, xyscale, stride):
     # pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...classes))
     grid_size = tf.shape(pred)[1:3]
     box_xy, box_wh, objectness, class_probs = tf.split(
@@ -190,8 +190,7 @@ def yolov4_boxes(pred, anchors, classes, xyscale, strides):
     grid = tf.expand_dims(tf.stack(grid, axis=-1), axis=2)  # [gx, gy, 1, 2]
     #grid = tf.tile(tf.expand_dims(grid, axis=0), [tf.shape(pred)[0], 1, 1, 3, 1])
 
-    box_xy = ((box_xy * xyscale) - 0.5 * (xyscale - 1) + tf.cast(grid, tf.float32)) / tf.cast(grid_size, tf.float32) # * strides
-    #
+    box_xy = ((box_xy * xyscale - 0.5 * (xyscale - 1) + tf.cast(grid, tf.float32)) / tf.cast(grid_size, tf.float32)
     box_wh = tf.exp(box_wh) * anchors
 
     #bbox = tf.concat([box_xy, box_wh], axis=-1)
@@ -201,7 +200,7 @@ def yolov4_boxes(pred, anchors, classes, xyscale, strides):
 
     return bbox, objectness, class_probs, pred_box
 
-def filter_boxes(outputs, anchors, masks, classes, score_threshold=0.25, input_shape=tf.constant([608,608], tf.float32)):
+def filter_boxes(outputs, anchors, masks, classes, score_threshold=0.45, input_shape=tf.constant([608,608], tf.float32)):
     # boxes, conf, type
     b, c, t = [], [], []
 
@@ -237,7 +236,7 @@ def filter_boxes(outputs, anchors, masks, classes, score_threshold=0.25, input_s
 
 
 def YoloV4(size=None, channels=3, anchors=yolov4_anchors,
-           masks=yolov4_anchor_masks, xyscale=xyscale, classes=80, training=False):
+           masks=yolov4_anchor_masks, xyscales=xyscales, classes=80, training=False):
     x = inputs = Input([size, size, channels], name='input')
     # Backbone
     x54, x85, x = cspdarknet53(name='yolo_cspdarknet53')(x)
@@ -258,23 +257,23 @@ def YoloV4(size=None, channels=3, anchors=yolov4_anchors,
     if training:
         return Model(inputs, (output_0, output_1, output_2), name='yolov4')
 
-    boxes_0 = Lambda(lambda x: yolov4_boxes(x, anchors[masks[0]],  classes, xyscale[0], strides[0]),
+    boxes_0 = Lambda(lambda x: yolov4_boxes(x, anchors[masks[0]],  classes, xyscales[0], strides[0]),
                      name='yolo_boxes_0')(output_0)
-    boxes_1 = Lambda(lambda x: yolov4_boxes(x, anchors[masks[1]], classes, xyscale[1], strides[1]),
+    boxes_1 = Lambda(lambda x: yolov4_boxes(x, anchors[masks[1]], classes, xyscales[1], strides[1]),
                      name='yolo_boxes_1')(output_1)
-    boxes_2 = Lambda(lambda x: yolov4_boxes(x, anchors[masks[2]], classes, xyscale[2], strides[2]),
+    boxes_2 = Lambda(lambda x: yolov4_boxes(x, anchors[masks[2]], classes, xyscales[2], strides[2]),
                      name='yolo_boxes_2')(output_2)
     #
     outputs = Lambda(lambda x: filter_boxes(x, anchors, masks, classes),
                      name='yolo_nms')((boxes_0[:3], boxes_1[:3], boxes_2[:3]))
     return Model(inputs, outputs, name='yolov4')
 
-def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
+def YoloLoss(anchors, classes=80, ignore_thresh=0.5, xyscale, stride):
     def yolo_loss(y_true, y_pred):
         # 1. transform all pred outputs
         # y_pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...cls))
         pred_box, pred_obj, pred_class, pred_xywh = yolov4_boxes(
-            y_pred, anchors, classes)
+            y_pred, anchors, classes, xyscale, stride)
         pred_xy = pred_xywh[..., 0:2]
         pred_wh = pred_xywh[..., 2:4]
 

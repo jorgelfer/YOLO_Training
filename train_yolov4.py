@@ -12,13 +12,13 @@ from tensorflow.keras.callbacks import (
 )
 from yolov3_tf2.yolov4 import (
     YoloV4, YoloLoss,
-    yolov4_anchors, yolov4_anchor_masks,
+    yolov4_anchors, yolov4_anchor_masks, xyscales, strides
 )
 from yolov3_tf2.utils import freeze_all
 import yolov3_tf2.dataset as dataset
 
-flags.DEFINE_string('dataset', '/home/jorge/Desktop/yolov3-tf2-master/data/MOT20_tfrecords/MOT20_train_*-of-*_*-of-*.records', 'path to dataset')
-flags.DEFINE_string('val_dataset', '/home/jorge/Desktop/yolov3-tf2-master/data/MOT20_tfrecords/MOT20_val_*-of-*_*-of-*.records', 'path to validation dataset')
+flags.DEFINE_string('dataset', '/home/jorge/Desktop/yolov3-tf2-master/data/MOT20_tfrecords/MOT20_train_00000-of-00003_00000-of-00002.records', 'path to dataset')
+flags.DEFINE_string('val_dataset', '/home/jorge/Desktop/yolov3-tf2-master/data/MOT20_tfrecords/MOT20_val_00000-of-00003_00002-of-00002.records', 'path to validation dataset')
 flags.DEFINE_boolean('tiny', False, 'yolov3 or yolov3-tiny')
 flags.DEFINE_string('weights', '/home/jorge/Desktop/yolov3-tf2-master/checkpoints/yolov4.tf',
                     'path to weights file')
@@ -114,8 +114,8 @@ def main(_argv):
             freeze_all(model)
 
     optimizer = tf.keras.optimizers.Adam(lr=FLAGS.learning_rate)
-    loss = [YoloLoss(anchors[mask], classes=FLAGS.num_classes)
-            for mask in anchor_masks]
+    loss = [YoloLoss(anchors[mask], classes=FLAGS.num_classes, xyscale=xyscale, stride=stride)
+            for mask, xyscale, stride in zip(anchor_masks, xyscales, strides)]
 
     if FLAGS.mode == 'eager_tf':
         # Eager mode is great for debugging

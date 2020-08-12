@@ -90,7 +90,7 @@ def transform_targets_yolov4(y_train, anchors, anchor_masks, size):
     for anchor_idxs in anchor_masks:
         y_outs.append(transform_targets_for_output(
             y_train, grid_size, anchor_idxs))
-        grid_size /= 2
+        grid_size = grid_size // 2
 
     return tuple(y_outs)
 
