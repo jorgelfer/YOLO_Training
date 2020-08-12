@@ -22,7 +22,7 @@ from tensorflow.keras.losses import (
 )
 from .utils import broadcast_iou
 
-flags.DEFINE_integer('yolo_max_boxes', 100,
+flags.DEFINE_integer('yolo_max_boxes', 300,
                      'maximum number of boxes per image')
 flags.DEFINE_float('yolo_iou_threshold', 0.3, 'iou threshold')
 flags.DEFINE_float('yolo_score_threshold', 0.6, 'score threshold')
