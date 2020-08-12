@@ -52,7 +52,6 @@ def main(_argv):
     if FLAGS.dataset:
         train_dataset = dataset.load_tfrecord_dataset(
             FLAGS.dataset, FLAGS.classes, FLAGS.size)
-    breakpoint()
     tsteps = sum(1 for _ in train_dataset)
     train_dataset = train_dataset.shuffle(buffer_size=256, reshuffle_each_iteration=True)
     train_dataset = train_dataset.batch(FLAGS.batch_size, drop_remainder=True)
