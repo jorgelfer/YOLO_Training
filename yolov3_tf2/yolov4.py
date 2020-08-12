@@ -174,7 +174,7 @@ def YoloOutput(filters, anchors, classes, name=None):
         return tf.keras.Model(inputs, x, name=name)(x_in)
     return yolo_output
 
-def yolov4_boxes(pred, anchors, classes, xyscale, stride):
+def yolov4_boxes(pred, anchors, classes, xyscale, strides):
     # pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...classes))
     grid_size = tf.shape(pred)[1:3]
     box_xy, box_wh, objectness, class_probs = tf.split(
@@ -190,7 +190,8 @@ def yolov4_boxes(pred, anchors, classes, xyscale, stride):
     grid = tf.expand_dims(tf.stack(grid, axis=-1), axis=2)  # [gx, gy, 1, 2]
     #grid = tf.tile(tf.expand_dims(grid, axis=0), [tf.shape(pred)[0], 1, 1, 3, 1])
 
-    box_xy = ((box_xy * xyscale - 0.5 * (xyscale - 1) + tf.cast(grid, tf.float32)) / tf.cast(grid_size, tf.float32)
+    box_xy = ((box_xy * xyscale) - 0.5 * (xyscale - 1) + tf.cast(grid, tf.float32)) / tf.cast(grid_size, tf.float32) # * strides
+    #
     box_wh = tf.exp(box_wh) * anchors
 
     #bbox = tf.concat([box_xy, box_wh], axis=-1)
@@ -268,7 +269,7 @@ def YoloV4(size=None, channels=3, anchors=yolov4_anchors,
                      name='yolo_nms')((boxes_0[:3], boxes_1[:3], boxes_2[:3]))
     return Model(inputs, outputs, name='yolov4')
 
-def YoloLoss(anchors, classes=80, ignore_thresh=0.5, xyscale, stride):
+def YoloLoss(anchors, xyscale, stride, classes=80, ignore_thresh=0.5):
     def yolo_loss(y_true, y_pred):
         # 1. transform all pred outputs
         # y_pred: (batch_size, grid, grid, anchors, (x, y, w, h, obj, ...cls))
