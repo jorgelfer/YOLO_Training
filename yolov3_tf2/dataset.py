@@ -152,7 +152,7 @@ def load_tfrecord_dataset(file_pattern, class_file, size=416):
     #ds_size = sum(1 for _ in files)
     #return files.interleave(lambda x: tf.data.TFRecordDataset(x).map(parse_tfrecord), cycle_length=ds_size, block_length=8, num_parallel_calls=tf.data.experimental.AUTOTUNE, deterministic=False)
     dataset = files.flat_map(tf.data.TFRecordDataset)
-    return dataset.map(lambda x: parse_tfrecord(x, size))
+    return dataset.map(lambda x: parse_tfrecord(x, size=size))
 
 
 def load_fake_dataset():
