@@ -30,9 +30,9 @@ def main(_argv):
     print("Ratios:\n {}".format(sorted(ratios)))
     #
     # sort BB according to their area.
-    areas = np.multiply(out[:,0],out[:,1])
-    out_sorted = out[sorted(range(len(areas)), key=lambda k: areas[k]),:]
-    print(out_sorted)
+    areas = np.multiply(out[:, 0], out[:, 1])
+    out_sorted = out[sorted(range(len(areas)), key=lambda k: areas[k]), :]
+    print("Sorted boxes according to area:\n {}".format(out_sorted))
 
 if __name__ == '__main__':
     try:
