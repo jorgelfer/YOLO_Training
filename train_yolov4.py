@@ -55,10 +55,10 @@ def main(_argv):
     tsteps = sum(1 for _ in train_dataset)
     train_dataset = train_dataset.shuffle(buffer_size=256, reshuffle_each_iteration=True)
     train_dataset = train_dataset.batch(FLAGS.batch_size, drop_remainder=True)
-    train_dataset = train_dataset.repeat(FLAGS.epochs)
     train_dataset = train_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets_yolov4(y, anchors, anchor_masks, FLAGS.size)))
+    train_dataset = train_dataset.repeat(FLAGS.epochs)
     train_dataset = train_dataset.prefetch(
         buffer_size=tf.data.experimental.AUTOTUNE)
 
@@ -68,10 +68,10 @@ def main(_argv):
             FLAGS.val_dataset, FLAGS.classes, FLAGS.size)
     vsteps = sum(1 for _ in val_dataset)
     val_dataset = val_dataset.batch(FLAGS.batch_size, drop_remainder=True)
-    val_dataset = val_dataset.repeat(FLAGS.epochs)
     val_dataset = val_dataset.map(lambda x, y: (
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets_yolov4(y, anchors, anchor_masks, FLAGS.size)))
+    val_dataset = val_dataset.repeat(FLAGS.epochs)
 
     # Configure the model for transfer learning
     if FLAGS.transfer == 'none':
@@ -96,11 +96,11 @@ def main(_argv):
             freeze_all(model.get_layer('yolo_spp'))
             freeze_all(model.get_layer('yolo_pan'))
         elif FLAGS.transfer == 'no_output':
-            for l in model.layers:
-                if not l.name.startswith('yolo_output'):
-                    l.set_weights(model_pretrained.get_layer(
-                        l.name).get_weights())
-                    freeze_all(l)
+            for la in model.layers:
+                if not la.name.startswith('yolo_output'):
+                    la.set_weights(model_pretrained.get_layer(
+                        la.name).get_weights())
+                    freeze_all(la)
 
     else:
         # All other transfer require matching classes
