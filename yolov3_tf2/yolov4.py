@@ -25,11 +25,20 @@ from .utils import broadcast_iou
 flags.DEFINE_integer('yolo_max_boxes', 300,
                      'maximum number of boxes per image')
 flags.DEFINE_float('yolo_iou_threshold', 0.3, 'iou threshold')
-flags.DEFINE_float('yolo_score_threshold', 0.6, 'score threshold')
+flags.DEFINE_float('yolo_score_threshold', 0.7, 'score threshold')
 
 ####################################
 # For YoloV4 ######################
-yolov4_anchors = np.array([(12, 16), (19, 36), (40,28), (36,75), (76,55),(72,146), (142,110), (192,243), (459,401)], np.float32) / 608
+#yolov4_anchors = np.array([(12, 16), (19, 36), (40,28), (36,75), (76,55),(72,146), (142,110), (192,243), (459,401)], np.float32) / 608
+yolov4_anchors = np.array([[0.03204352, 0.04659091],
+                           [0.02813303, 0.09090909],
+                           [0.03665814, 0.10454546],
+                           [0.03204353, 0.12870371],
+                           [0.03990326, 0.1324074 ],
+                           [0.03748488, 0.15370369],
+                           [0.04688829, 0.14537036],
+                           [0.04655381, 0.16851848],
+                           [0.059375  , 0.22962964]])
 yolov4_anchor_masks = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 xyscales = np.array([1.2, 1.1, 1.05])
 strides = np.array([8, 16, 32])
