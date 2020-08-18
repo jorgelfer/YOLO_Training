@@ -33,7 +33,7 @@ def transform_targets_for_output(y_true, grid_size, anchor_idxs):
                 indexes = indexes.write(
                     idx, [i, grid_xy[1], grid_xy[0], anchor_idx[0][0]])
                 updates = updates.write(
-                    idx, [box[0], box[1], box[2], box[3], 1, y_true[i][j][4]])
+                    idx, [box[0], box[1], box[2], box[3], 1, y_true[i][j][4] + 1])
                 idx += 1
 
     # tf.print(indexes.stack())
