@@ -197,7 +197,7 @@ def yolov4_boxes(pred, anchors, classes, xyscale, strides):
     # !!! grid[x][y] == (y, x)
     grid = tf.meshgrid(tf.range(grid_size[1]), tf.range(grid_size[0]))
     grid = tf.expand_dims(tf.stack(grid, axis=-1), axis=2)  # [gx, gy, 1, 2]
-    #grid = tf.tile(tf.expand_dims(grid, axis=0), [tf.shape(pred)[0], 1, 1, 3, 1])
+    grid = tf.tile(tf.expand_dims(grid, axis=0), [tf.shape(pred)[0], 1, 1, 3, 1])
 
     box_xy = ((box_xy * xyscale) - 0.5 * (xyscale - 1) + tf.cast(grid, tf.float32)) / tf.cast(grid_size, tf.float32) # * strides
     #
